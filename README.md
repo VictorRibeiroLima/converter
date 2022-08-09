@@ -45,7 +45,7 @@ func main() {
 	fmt.Println(user)
 }
 ```
-Well that's why this package was made,to make does simple conversions
+Well that's why this package was made,to make those simple conversions
 
 ```go
 func main() {
