@@ -63,7 +63,7 @@ func main() {
     User{
       ID: 0,
       UserName: "LukeSlywalker",
-	  Password: "benKenoby1977",
+      Password: "benKenoby1977",
       IsAdmin: false
     }
   */
@@ -132,13 +132,13 @@ func main() {
     User{
       ID: 0,
       UserName: 0xc000010250,
-	  Password: 0xc000010260,
+      Password: 0xc000010260,
       IsAdmin: false,
       Address: {
         ID 0,
         Country: "Jundland Wastes",
-		City:    "Great Chott salt flat",
-		Street:  "Lars homestead",
+	City:    "Great Chott salt flat",
+	Street:  "Lars homestead",
       }
     }
   */
