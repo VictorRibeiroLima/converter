@@ -6,7 +6,6 @@ import (
 )
 
 func Convert(to any, from any) error {
-	//
 	pointerToResult := reflect.ValueOf(to)
 	reflectedValueOfResult := pointerToResult.Elem()
 	if reflectedValueOfResult.Kind() != reflect.Struct {
