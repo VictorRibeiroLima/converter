@@ -17,7 +17,7 @@ jobs:
       run: |
         go vet ./...
     - name: test
-      run: go test
+      run: go test ./... -coverprofile coverage.out -covermode count
     - name: Unit tests
       run: |
             sudo go test ./... -coverprofile coverage.out -covermode count
