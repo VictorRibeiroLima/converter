@@ -60,8 +60,8 @@ func valueSeter(setTo reflect.Value, value reflect.Value) bool {
 		return true
 	} else if setTo.Kind() == reflect.Array || setTo.Kind() == reflect.Slice {
 		setToFieldType := setTo.Type().Elem()
-		arrayValue := reflect.New(setToFieldType).Elem()
 		for i := 0; i < value.Len(); i++ {
+			arrayValue := reflect.New(setToFieldType).Elem()
 			item := value.Index(i)
 			result := setValue(arrayValue, item)
 			if result {

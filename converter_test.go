@@ -6,6 +6,79 @@ import (
 	"github.com/VictorRibeiroLima/converter"
 )
 
+func TestEmbeddedArray(t *testing.T) {
+	type FromSecondLayer struct {
+		SName string
+		SID   uint
+	}
+	type FromFirstLayer struct {
+		Name   string
+		ID     uint
+		Second []FromSecondLayer
+	}
+	type From struct {
+		First []FromFirstLayer
+	}
+
+	type ToSecondLayer struct {
+		SName string
+		SID   uint
+	}
+	type ToFirstLayer struct {
+		Name   string
+		ID     uint
+		Second []ToSecondLayer
+	}
+	type To struct {
+		First []ToFirstLayer
+	}
+
+	fs1 := FromSecondLayer{
+		SName: "1",
+		SID:   1,
+	}
+	fs2 := FromSecondLayer{
+		SName: "2",
+		SID:   2,
+	}
+
+	ff1 := FromFirstLayer{
+		Name: "1",
+		ID:   1,
+	}
+
+	ff2 := FromFirstLayer{
+		Name:   "2",
+		ID:     2,
+		Second: []FromSecondLayer{fs1, fs2},
+	}
+
+	ff3 := FromFirstLayer{
+		Name: "3",
+		ID:   3,
+	}
+
+	f := From{
+		First: []FromFirstLayer{ff1, ff2, ff3},
+	}
+
+	var to To
+	converter.Convert(&to, f)
+
+	if to.First[0].Second != nil {
+		t.Error("Expected First[0].Second to be nil. instead got a value \n")
+	}
+	if to.First[1].Second == nil {
+		t.Error("Expected First[1].Second to have a value. instead got nil \n")
+	}
+	if len(to.First[1].Second) != 2 {
+		t.Errorf("Expected First[1].Second to have a len of 2. instead got %d \n", len(to.First[1].Second))
+	}
+	if to.First[2].Second != nil {
+		t.Error("Expected First[2].Second to be nil. instead got a value \n")
+	}
+}
+
 func TestSimpleTypeConversiont(t *testing.T) {
 	type To struct {
 		A string
