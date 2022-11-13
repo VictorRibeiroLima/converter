@@ -79,7 +79,7 @@ func TestEmbeddedArray(t *testing.T) {
 	}
 }
 
-func TestSimpleTypeConversiont(t *testing.T) {
+func TestSimpleTypeConversion(t *testing.T) {
 	type To struct {
 		A string
 		B int
@@ -627,4 +627,112 @@ func TestPoiterToValueArrayTypeConversion(t *testing.T) {
 	if len(to.NotMachArray) > 0 {
 		t.Errorf("Property 'NotMachArray' should be empty. instead got %d", len(to.NotMachArray))
 	}
+}
+
+func TestArrayConversion(t *testing.T) {
+	type FromSecondLayer struct {
+		SName string
+		SID   uint
+	}
+	type FromFirstLayer struct {
+		Name   string
+		ID     uint
+		Second []FromSecondLayer
+	}
+	type ToSecondLayer struct {
+		SName string
+		SID   uint
+	}
+	type ToFirstLayer struct {
+		Name   string
+		ID     uint
+		Second []ToSecondLayer
+	}
+
+	fs1 := FromSecondLayer{
+		SName: "1",
+		SID:   1,
+	}
+	fs2 := FromSecondLayer{
+		SName: "2",
+		SID:   2,
+	}
+
+	ff1 := FromFirstLayer{
+		Name: "1",
+		ID:   1,
+	}
+
+	ff2 := FromFirstLayer{
+		Name:   "2",
+		ID:     2,
+		Second: []FromSecondLayer{fs1, fs2},
+	}
+
+	ff3 := FromFirstLayer{
+		Name: "3",
+		ID:   3,
+	}
+	from := []FromFirstLayer{ff1, ff2, ff3}
+	var to []ToFirstLayer
+	err := converter.Convert(&to, from)
+	if err != nil {
+		t.Errorf("Expected err to be nil. instead got %s", err)
+	}
+	for i := range to {
+		fromValue := from[i]
+		toValue := to[i]
+		if toValue.ID != fromValue.ID {
+			t.Errorf("Expected ID to equal %d. instead got %d", fromValue.ID, toValue.ID)
+		}
+		if toValue.Name != fromValue.Name {
+			t.Errorf("Expected ID to equal %s. instead got %s", fromValue.Name, toValue.Name)
+		}
+	}
+	if to[0].Second != nil {
+		t.Error("Expected to[0].Second to be nil. instead got a value \n")
+	}
+	if to[1].Second == nil {
+		t.Error("Expected to[1].Second to have a value. instead got nil \n")
+	}
+	if len(to[1].Second) != 2 {
+		t.Errorf("Expected to[1].Second to have a len of 2. instead got %d \n", len(to[1].Second))
+	}
+	if to[2].Second != nil {
+		t.Error("Expected to[2].Second to be nil. instead got a value \n")
+	}
+}
+
+func TestIncompatibleType(t *testing.T) {
+	type A struct {
+		Name string
+	}
+	type B struct {
+		Name string
+	}
+	t.Run("to array", func(t *testing.T) {
+		a := A{Name: "1"}
+		var b []B
+		err := converter.Convert(&b, a)
+		if err == nil {
+			t.Fatal("Expected err to have a value. instead got nil")
+		}
+
+		if err.Error() != "incompatible types" {
+			t.Errorf("Expected err to equal 'incompatible types'. instead got '%s'", err)
+		}
+
+	})
+	t.Run("to struct", func(t *testing.T) {
+		a := []A{{Name: "1"}}
+		var b B
+		err := converter.Convert(&b, a)
+		if err == nil {
+			t.Fatal("Expected err to have a value. instead got nil")
+		}
+
+		if err.Error() != "incompatible types" {
+			t.Errorf("Expected err to equal 'incompatible types'. instead got '%s'", err)
+		}
+	})
 }
