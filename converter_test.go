@@ -133,7 +133,7 @@ func TestSimpleTypeConversion(t *testing.T) {
 	}
 }
 
-func TestNestedStructTypeConversiont(t *testing.T) {
+func TestNestedStructTypeConversion(t *testing.T) {
 
 	type NestedTo struct {
 		A string
@@ -211,7 +211,7 @@ func TestNestedStructTypeConversiont(t *testing.T) {
 	}
 }
 
-func TestArrayStructTypeConversiont(t *testing.T) {
+func TestArrayStructTypeConversion(t *testing.T) {
 
 	type NestedTo struct {
 		A string
@@ -315,7 +315,7 @@ func TestArrayStructTypeConversiont(t *testing.T) {
 	}
 }
 
-func TestValueToPointerTypeConversiont(t *testing.T) {
+func TestValueToPointerTypeConversion(t *testing.T) {
 	type NestedTo struct {
 		A string
 		B int
@@ -385,7 +385,139 @@ func TestValueToPointerTypeConversiont(t *testing.T) {
 	}
 }
 
-func TestValueToPointerArrayTypeConversiont(t *testing.T) {
+func TestValueToPointerFromPointerTypeConversion(t *testing.T) {
+	type NestedTo struct {
+		A string
+		B int
+		C string
+	}
+
+	type NestedFrom struct {
+		A string
+		B int
+		D string
+	}
+
+	type To struct {
+		P      *string
+		Nested *NestedTo
+		Hp     *int
+		e      string
+	}
+
+	type From struct {
+		P      string
+		Nested *NestedFrom
+		Hp     string
+		e      string
+	}
+
+	nested := NestedFrom{
+		A: "TEST",
+		B: 1,
+		D: "FASFAs",
+	}
+
+	from := From{
+
+		P:      "asdasd",
+		Nested: &nested,
+		e:      "test",
+	}
+
+	var to To
+
+	err := converter.Convert(&to, from)
+
+	if err != nil {
+		t.Error("Simple conversion error")
+	}
+
+	if *to.P != from.P {
+		t.Errorf("Property 'P' expected to be %s. instead got %s", from.P, *to.P)
+	}
+
+	if to.e != "" {
+		t.Errorf("Property 'e' should be empty. instead got %s", to.e)
+	}
+
+	if (*to.Nested).A != from.Nested.A {
+		t.Errorf("Property 'A' expected to be %s. instead got %s", from.Nested.A, to.Nested.A)
+	}
+
+	if (*to.Nested).B != from.Nested.B {
+		t.Errorf("Property 'B' expected to be %d. instead got %d", from.Nested.B, to.Nested.B)
+	}
+
+	if (*to.Nested).C != "" {
+		t.Errorf("Property 'C' should be empty. instead got %s", to.Nested.C)
+	}
+
+	if to.Hp != nil {
+		t.Errorf("Property 'Hp' shold be nil. instead got %d", *to.Hp)
+	}
+}
+
+func TestValueToPointerFromPointerNillTypeConversion(t *testing.T) {
+	type NestedTo struct {
+		A string
+		B int
+		C string
+	}
+
+	type NestedFrom struct {
+		A string
+		B int
+		D string
+	}
+
+	type To struct {
+		P      *string
+		Nested *NestedTo
+		Hp     *int
+		e      string
+	}
+
+	type From struct {
+		P      string
+		Nested *NestedFrom
+		Hp     string
+		e      string
+	}
+
+	from := From{
+
+		P:      "asdasd",
+		Nested: nil,
+		e:      "test",
+	}
+
+	var to To
+
+	err := converter.Convert(&to, from)
+
+	if err != nil {
+		t.Error("Simple conversion error")
+	}
+
+	if *to.P != from.P {
+		t.Errorf("Property 'P' expected to be %s. instead got %s", from.P, *to.P)
+	}
+
+	if to.e != "" {
+		t.Errorf("Property 'e' should be empty. instead got %s", to.e)
+	}
+
+	if to.Nested != nil {
+		t.Errorf("Property 'Nested' shold be nil")
+	}
+
+	if to.Hp != nil {
+		t.Errorf("Property 'Hp' shold be nil. instead got %d", *to.Hp)
+	}
+}
+
+func TestValueToPointerArrayTypeConversion(t *testing.T) {
 	type NestedTo struct {
 		A string
 		B int
