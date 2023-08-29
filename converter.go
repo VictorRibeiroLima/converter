@@ -73,6 +73,9 @@ func valueSetter(setTo reflect.Value, value reflect.Value) bool {
 	} else if setTo.Kind() == reflect.Array || setTo.Kind() == reflect.Slice {
 		return convertArray(setTo, value)
 	} else {
+		if value.IsNil() {
+			return true
+		}
 		setToFieldType := setTo.Type().Elem()
 		pointerValue := reflect.New(setToFieldType).Elem()
 		valueSetter(pointerValue, value.Elem())
