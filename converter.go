@@ -72,7 +72,7 @@ func valueSetter(setTo reflect.Value, value reflect.Value) bool {
 		return true
 	} else if setTo.Kind() == reflect.Array || setTo.Kind() == reflect.Slice {
 		return convertArray(setTo, value)
-	} else {
+	} else if value.Kind() == reflect.Pointer {
 		if value.IsNil() {
 			return true
 		}
@@ -82,6 +82,7 @@ func valueSetter(setTo reflect.Value, value reflect.Value) bool {
 		setTo.Set(pointerValue.Addr())
 		return true
 	}
+	return false
 }
 
 func convertArray(setTo reflect.Value, value reflect.Value) bool {

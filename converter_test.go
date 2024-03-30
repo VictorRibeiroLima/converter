@@ -2,6 +2,7 @@ package converter_test
 
 import (
 	"testing"
+	"time"
 
 	"github.com/VictorRibeiroLima/converter"
 )
@@ -580,7 +581,7 @@ func TestValueToPointerArrayTypeConversion(t *testing.T) {
 	}
 }
 
-func TestValueToPointerArrayPointerTypeConversiont(t *testing.T) {
+func TestValueToPointerArrayPointerTypeConversion(t *testing.T) {
 	type NestedTo struct {
 		A string
 		B int
@@ -636,7 +637,7 @@ func TestValueToPointerArrayPointerTypeConversiont(t *testing.T) {
 	}
 }
 
-func TestPointerToValueTypeConversiont(t *testing.T) {
+func TestPointerToValueTypeConversion(t *testing.T) {
 	type NestedTo struct {
 		A string
 		B int
@@ -696,7 +697,7 @@ func TestPointerToValueTypeConversiont(t *testing.T) {
 	}
 }
 
-func TestPoiterToValueArrayTypeConversion(t *testing.T) {
+func TestPointerToValueArrayTypeConversion(t *testing.T) {
 	type NestedTo struct {
 		A string
 		B int
@@ -867,4 +868,63 @@ func TestIncompatibleType(t *testing.T) {
 			t.Errorf("Expected err to equal 'incompatible types'. instead got '%s'", err)
 		}
 	})
+}
+
+func TestAllPointerToValues(t *testing.T) {
+	type From struct {
+		Status          *string    `json:"status"`
+		SomeEnum        *string    `json:"someEnum"`
+		SomeDate        *time.Time `json:"someDate"`
+		Observation     *string    `json:"observation"`
+		MaxInterestRate *float32   `json:"maxInterestRate"`
+		NillValue       *string    `json:"nillValue"`
+	}
+
+	type SomeEnum string
+
+	type To struct {
+		Status          string    `json:"status"`
+		SomeEnum        SomeEnum  `json:"secondaryStatus"`
+		SomeDate        time.Time `json:"someDate"`
+		Observation     string    `json:"observation"`
+		MaxInterestRate float32   `json:"maxInterestRate"`
+		NillValue       string    `json:"nillValue"`
+	}
+
+	from := From{
+		Status:          &[]string{"test"}[0],
+		SomeEnum:        &[]string{"test"}[0],
+		SomeDate:        &time.Time{},
+		Observation:     &[]string{"test"}[0],
+		MaxInterestRate: &[]float32{1.0}[0],
+	}
+
+	var to To
+
+	err := converter.Convert(&to, from)
+
+	if err != nil {
+		t.Error("Simple conversion error")
+	}
+
+	if to.Status != *from.Status {
+		t.Errorf("Property 'Status' expected to be %s. instead got %s", *from.Status, to.Status)
+	}
+
+	if to.SomeDate != *from.SomeDate {
+		t.Errorf("Property 'SomeDate' expected to be %s. instead got %s", *from.SomeDate, to.SomeDate)
+	}
+
+	if to.Observation != *from.Observation {
+		t.Errorf("Property 'Observation' expected to be %s. instead got %s", *from.Observation, to.Observation)
+	}
+
+	if to.MaxInterestRate != *from.MaxInterestRate {
+		t.Errorf("Property 'MaxInterestRate' expected to be %f. instead got %f", *from.MaxInterestRate, to.MaxInterestRate)
+	}
+
+	if to.NillValue != "" {
+		t.Errorf("Property 'NillValue' should be empty. instead got %s", to.NillValue)
+	}
+
 }
