@@ -928,3 +928,49 @@ func TestAllPointerToValues(t *testing.T) {
 	}
 
 }
+
+func TestPointerToSettedValue(t *testing.T) {
+	type From struct {
+		Status *string `json:"status"`
+	}
+
+	type To struct {
+		Status string `json:"status"`
+	}
+
+	from := From{
+		Status: nil,
+	}
+
+	to := To{
+		Status: "test",
+	}
+
+	err := converter.Convert(&to, from)
+
+	if err != nil {
+		t.Error("Simple conversion error")
+	}
+
+	if to.Status != "test" {
+		t.Errorf("Property 'Status' expected to be %s. instead got %s", "test", to.Status)
+	}
+
+	from = From{
+		Status: &[]string{"test"}[0],
+	}
+
+	to = To{
+		Status: "override",
+	}
+
+	err = converter.Convert(&to, from)
+
+	if err != nil {
+		t.Error("Simple conversion error")
+	}
+
+	if to.Status != *from.Status {
+		t.Errorf("Property 'Status' expected to be %s. instead got %s", *from.Status, to.Status)
+	}
+}
